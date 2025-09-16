@@ -6765,26 +6765,30 @@ cve_intelligence = CVEIntelligenceManager()
 exploit_generator = AIExploitGenerator()
 vulnerability_correlator = VulnerabilityCorrelator()
 
-def execute_command(command: str, use_cache: bool = True) -> Dict[str, Any]:
+def execute_command(command: str, use_cache: bool = True, timeout: Optional[int] = None) -> Dict[str, Any]:
     """
     Execute a shell command with enhanced features
-    
+
     Args:
         command: The command to execute
         use_cache: Whether to use caching for this command
-        
+        timeout: Maximum execution time in seconds before termination
+
     Returns:
         A dictionary containing the stdout, stderr, return code, and metadata
     """
-    
+
     # Check cache first
     if use_cache:
         cached_result = cache.get(command, {})
         if cached_result:
             return cached_result
-    
+
+    if timeout is None:
+        timeout = COMMAND_TIMEOUT
+
     # Execute command
-    executor = EnhancedCommandExecutor(command)
+    executor = EnhancedCommandExecutor(command, timeout=timeout)
     result = executor.execute()
     
     # Cache successful results
